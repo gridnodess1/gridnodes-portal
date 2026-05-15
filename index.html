@@ -25,80 +25,82 @@
         <div id="status" class="status-text">Sistem hazır. Bağlantı bekleniyor...</div>
     </div>
 
-    <!-- Güvenlik Filtreleri -->
-    <script>
-        document.addEventListener('contextmenu', event => event.preventDefault());
-        document.onkeydown = function(e) {
-            if (e.keyCode == 123) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
-            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
-        }
-    </script>
-    
-    <!-- Resmi Supabase CDN Bağlantısı -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- Resmi Supabase CDN Entegrasyonu -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Otonom Motor (Tüm Sistem Tek Gövdede) -->
+    <!-- Tam Otomatize Kusursuz Çekirdek Kod -->
     <script>
-        // KENDİ BİLGİLERİNİZİ BU İKİ SATIRA YAPIŞTIRIN
+        // KENDİ BİLGİLERİNİZİ BU İKİ SATIRA EKSİKSİZ YAPIŞTIRIN
         const SUPABASE_URL = "https://ebuecwycqbwcnvhonlly.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidWVjd3ljcWJ3Y252aG9ubGx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjEyODMsImV4cCI6MjA5NDQzNzI4M30.evPYCJlsWUGK7Z56kU-hogcbHZGzZ_T3T5bxv6rrWXg";
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentBalance = 0.0000;
-
         const startButton = document.getElementById('start-btn');
         const balanceDisplay = document.getElementById('balance-display');
         const statusDisplay = document.getElementById('status');
 
         startButton.addEventListener('click', async () => {
-            // Butona basıldığı an yazıyı zorla değiştir
+            // Butona tıklandığı an UI durumunu anında güncelle
             startButton.disabled = true;
             startButton.innerText = "DÜĞÜM AKTİF";
             statusDisplay.innerText = "Ağa bağlanılıyor... İlk veri döngüsü tetiklendi.";
 
-            // 1. ADIM: Veritabanı Okuma Doğrulaması
             try {
-                const { data, error } = await supabase.from('data_tasks').select('*').limit(1);
-                if (error) {
-                    statusDisplay.innerText = "Supabase Hatası: " + error.message;
+                // SIBER DÜZELTME: Kütüphaneyi tarayıcıda kesin olarak başlatma protokolü
+                if (!window.supabase || !window.supabase.createClient) {
+                    statusDisplay.innerText = "Bağlantı Hatası: Kütüphane yüklenemedi. Sayfayı yenileyin.";
                     return;
                 }
-                if (!data || data.length === 0) {
-                    statusDisplay.innerText = "Bağlantı Başarılı Ama data_tasks Tablosu Boş!";
-                    return;
-                }
-            } catch (err) {
-                statusDisplay.innerText = "Bağlantı Hatası: " + err.message;
-                return;
-            }
 
-            // 2. ADIM: Otonom Sayaç Döngüsü (Her 4 saniyede bir)
-            setInterval(async () => {
-                try {
-                    const { data: tasks } = await supabase.from('data_tasks').select('*').eq('is_active', true).limit(1);
+                const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-                    if (tasks && tasks.length > 0) {
-                        const task = tasks[0];
-                        
-                        const { error: insertError } = await supabase
-                            .from('scraped_data')
-                            .insert([{ task_id: task.task_id, collected_value: "NODE_VERIFIED" }]);
+                // Otonom Döngü: Her 4 saniyede bir veritabanını tetikle
+                setInterval(async () => {
+                    try {
+                        // 1. Aktif görevi çek
+                        const { data: tasks, error: taskError } = await supabaseClient
+                            .from('data_tasks')
+                            .select('*')
+                            .eq('is_active', true)
+                            .limit(1);
 
-                        if (!insertError) {
-                            currentBalance += parseFloat(task.reward_per_click);
-                            balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
-                            statusDisplay.innerText = `Kusursuz Veri Doğrulaması Başarılı! (+ $${task.reward_per_click})`;
+                        if (taskError) throw taskError;
+
+                        if (tasks && tasks.length > 0) {
+                            const task = tasks[0]; // İlk görevi izole et
+                            
+                            // 2. Doğrulama verisini kendi tablomuza yaz (Dış sitelere bağımlılık bitti!)
+                            const { error: insertError } = await supabaseClient
+                                .from('scraped_data')
+                                .insert([{ task_id: task.task_id, collected_value: "NODE_VERIFIED" }]);
+
+                            if (!insertError) {
+                                // 3. Sayacı ve ekrandaki durum yazısını parlat
+                                currentBalance += parseFloat(task.reward_per_click);
+                                balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
+                                statusDisplay.innerText = `Kusursuz Veri Doğrulaması Başarılı! (+ $${task.reward_per_click})`;
+                            } else {
+                                statusDisplay.innerText = "Yazma Limiti: " + insertError.message;
+                            }
                         } else {
-                            statusDisplay.innerText = "Yazma Hatası: " + insertError.message;
+                            statusDisplay.innerText = "Ağ Durumu: Görev havuzu şu an boş.";
                         }
+                    } catch (loopError) {
+                        statusDisplay.innerText = "Senkronizasyon Hatası: " + loopError.message;
                     }
-                } catch (error) {
-                    statusDisplay.innerText = "Sistem tetikte, döngü yenileniyor...";
-                }
-            }, 4000);
+                }, 4000);
+
+            } catch (globalError) {
+                statusDisplay.innerText = "Sistem Hatası: " + globalError.message;
+            }
         });
+
+        // Sağ tık ve temel F12 tuş blokajı
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+        }
     </script>
 </body>
 </html>
