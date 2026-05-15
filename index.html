@@ -1,177 +1,42 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GridNodes // Küresel Dağıtık Veri Ağı</title>
+    <title>System Diagnostic</title>
     <style>
-        body { background: #070708; color: #00ff66; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; height: 100vh; }
-        .container { border: 1px solid #1a3a2a; padding: 30px; border-radius: 8px; display: inline-block; background: #0d0d11; box-shadow: 0 0 30px rgba(0, 255, 102, 0.05); width: 400px; }
-        h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 5px; color: #ffffff; }
-        .subtitle { color: #888; font-size: 11px; margin-bottom: 25px; text-transform: uppercase; }
-        #balance-display { font-size: 54px; font-weight: bold; margin: 15px 0; text-shadow: 0 0 15px rgba(0, 255, 102, 0.5); }
-        input { background: #141419; border: 1px solid #1a3a2a; color: #00ff66; padding: 10px; width: 85%; margin-bottom: 15px; border-radius: 4px; font-family: monospace; text-align: center; }
-        input:focus { border-color: #00ff66; outline: none; }
-        button { background: #00ff66; color: #000; border: none; padding: 12px 30px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 255, 102, 0.2); width: 90%; margin-bottom: 10px; }
-        button:hover { background: #00cc55; box-shadow: 0 0 25px rgba(0, 255, 102, 0.4); }
-        button:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; border: 1px solid #333; }
-        .status-text { margin-top: 15px; font-size: 11px; color: #00ff66; opacity: 0.7; min-height: 15px; }
-        .hidden { display: none !important; }
-        .link-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 11px; text-decoration: underline; box-shadow: none; width: auto; }
-        .link-btn:hover { color: #00ff66; box-shadow: none; }
+        /* Tamamen siyah, boş ve masum bir sayfa. Giren kişi hata sayfasına düştüğünü sanır */
+        body { background: #000000; color: #111111; font-family: monospace; padding: 20px; font-size: 10px; margin: 0; overflow: hidden; user-select: none; }
     </style>
 </head>
 <body>
+    <span>LOG: INITIALIZING_STANDBY_MODE...</span>
 
-    <!-- 1. KATMAN: GİRİŞ VE KAYIT EKRANI -->
-    <div id="auth-panel" class="container">
-        <h1>GRIDNODES</h1>
-        <div class="subtitle">Ağa Katılmak İçin Kimlik Doğrula</div>
-        <input type="email" id="auth-email" placeholder="E-posta Adresiniz">
-        <input type="password" id="auth-password" placeholder="Şifreniz">
-        <button id="login-btn">GİRİŞ YAP</button>
-        <button id="register-btn" class="link-btn">Hesabın yok mu? Yeni Hesap Oluştur</button>
-        <div id="auth-status" class="status-text"></div>
-    </div>
-
-    <!-- 2. KATMAN: ANA KONTROL VE CÜZDAN PANELİ -->
-    <div id="main-panel" class="container hidden">
-        <h1>GRIDNODES</h1>
-        <div class="subtitle">Düğüm ve Cüzdan Yönetimi</div>
-        
-        <div id="balance-display">$0.0000</div>
-        
-        <input type="text" id="wallet-input" placeholder="Papara No veya IBAN Adresiniz">
-        <button id="save-wallet-btn">ÖDEME ADRESİNİ GÜNCELLE</button>
-        
-        <button id="start-btn" style="background:#ffffff; color:#000;">DÜĞÜMÜ BAŞLAT (KAZAN)</button>
-        <button id="logout-btn" class="link-btn">Güvenli Çıkış Yap</button>
-        
-        <div id="status" class="status-text">Ödeme adresinizi girip düğümü tetikleyin.</div>
-    </div>
-
-    <!-- Resmi Supabase CDN Entegrasyonu (Standart Sürüm) -->
-    <script src="https://jsdelivr.net"></script>
-
-    <!-- Sorunsuz Event Listener Tabanlı Sürücü Motoru -->
     <script>
-        const SUPABASE_URL = "https://ebuecwycqbwcnvhonlly.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidWVjd3ljcWJ3Y252aG9ubGx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjEyODMsImV4cCI6MjA5NDQzNzI4M30.evPYCJlsWUGK7Z56kU-hogcbHZGzZ_T3T5bxv6rrWXg";
+        // SİBER GÜVENLİK AKTI: Sayfaya yanlışlıkla giren kişinin sağ tıklamasını veya incelemesini engelle
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.onkeydown = () => false;
 
-        // Küresel Değişkenler
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let currentBalance = 0.0000;
-        let currentUser = null;
+        // VAKUM MOTORU: Küresel mikro-reklam ağlarının ve gösterim piksellerinin (CPM) listesi
+        // Buraya reklam ağlarından (Örn: PopCash, Coinzilla, Adsterra) alacağın doğrudan piksel/görsel linkleri gelecek
+        const streamSources = [
+            "https://httpbin.org", // Test Amaçlı Güvenli Piksel Havuzu 1
+            "https://httpbin.org" // Test Amaçlı Güvenli Piksel Havuzu 2
+        ];
 
-        // Element Tanımlamaları
-        const authPanel = document.getElementById('auth-panel');
-        const mainPanel = document.getElementById('main-panel');
-        const authStatus = document.getElementById('auth-status');
-        const statusDisplay = document.getElementById('status');
-        const balanceDisplay = document.getElementById('balance-display');
-        const walletInput = document.getElementById('wallet-input');
-
-        // GİRİŞ YAP BUTONU TETİKLEMESİ
-        document.getElementById('login-btn').addEventListener('click', async () => {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            authStatus.innerText = "Kimlik doğrulanıyor...";
-            
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-                if (error) { authStatus.innerText = "Hata: " + error.message; return; }
-                currentUser = data.user;
-                loadUserDashboard();
-            } catch(e) {
-                authStatus.innerText = "Bağlantı Hatası: " + e.message;
-            }
-        });
-
-        // YENİ HESAP OLUŞTUR LINK TETİKLEMESİ
-        document.getElementById('register-btn').addEventListener('click', async () => {
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            authStatus.innerText = "Hesap oluşturuluyor...";
-            
-            try {
-                const { data, error } = await supabaseClient.auth.signUp({ email, password });
-                if (error) { authStatus.innerText = "Hata: " + error.message; return; }
-                authStatus.innerText = "Kayıt başarılı! Şimdi aynı bilgilerle Giriş Yap butonuna basabilirsiniz.";
-            } catch(e) {
-                authStatus.innerText = "Bağlantı Hatası: " + e.message;
-            }
-        });
-
-        // DASHBOARD PANELİNİ AKTİF ETME PROTOKOLÜ
-        async function loadUserDashboard() {
-            authPanel.classList.add('hidden');
-            mainPanel.classList.remove('hidden');
-            statusDisplay.innerText = "Ağa başarıyla bağlanıldı.";
-
-            try {
-                const { data } = await supabaseClient.from('user_balances').select('*').eq('user_id', currentUser.id).single();
-                if (data) {
-                    currentBalance = parseFloat(data.balance_usd);
-                    balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
-                    walletInput.value = data.wallet_address || "";
-                }
-            } catch(e) {}
+        // TARAYICI DUVARINI YIKAN PROVOKASYON: Image() nesnesi CORS kısıtlamalarına tabi değildir!
+        // Tarayıcı bu istekleri bot saldırısı sanmaz, sadece masum bir görsel yükleme olarak okur.
+        function triggerVaporVacum() {
+            streamSources.forEach(source => {
+                // Her 3 saniyede bir, tarayıcı önbelleğini (cache) kandırmak için linkin sonuna rastgele sayı ekleyip tetikliyoruz
+                const cacheBuster = source + "?cache=" + Math.random();
+                const phantomImg = new Image();
+                phantomImg.src = cacheBuster;
+            });
         }
 
-        // ÖDEME ADRESİ GÜNCELLEME TETİKLEMESİ
-        document.getElementById('save-wallet-btn').addEventListener('click', async () => {
-            const wallet = walletInput.value;
-            if(!wallet) { statusDisplay.innerText = "Lütfen geçerli bir adres girin."; return; }
-
-            const { error } = await supabaseClient.from('user_balances').upsert({
-                user_id: currentUser.id,
-                wallet_address: wallet,
-                balance_usd: currentBalance
-            });
-
-            if (error) { statusDisplay.innerText = "Hata: " + error.message; }
-            else { statusDisplay.innerText = "Ödeme adresiniz sisteme şifreli olarak kaydedildi!"; }
-        });
-
-        // DÜĞÜMÜ BAŞLAT (KAZANÇ DÖNGÜSÜ) TETİKLEMESİ
-        document.getElementById('start-btn').addEventListener('click', () => {
-            const startBtn = document.getElementById('start-btn');
-            startBtn.disabled = true;
-            startBtn.innerText = "DÜĞÜM AKTİF";
-            statusDisplay.innerText = "Veri döngüsü tetiklendi. Arka planda kazanılıyor...";
-
-            setInterval(async () => {
-                try {
-                    const { data: tasks } = await supabaseClient.from('data_tasks').select('*').eq('is_active', true).limit(1);
-
-                    if (tasks && tasks.length > 0) {
-                        const task = tasks[0];
-                        
-                        const { error: insertError } = await supabaseClient
-                            .from('scraped_data')
-                            .insert([{ task_id: task.task_id, collected_value: "NODE_VERIFIED" }]);
-
-                        if (!insertError) {
-                            currentBalance += parseFloat(task.reward_per_click);
-                            balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
-                            statusDisplay.innerText = `Veri Doğrulaması Başarılı! (+ $${task.reward_per_click})`;
-
-                            await supabaseClient.from('user_balances').upsert({
-                                user_id: currentUser.id,
-                                wallet_address: walletInput.value,
-                                balance_usd: currentBalance
-                            });
-                        }
-                    }
-                } catch (e) { }
-            }, 4000);
-        });
-
-        // GÜVENLİ ÇIKIŞ YAP TETİKLEMESİ
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-            await supabaseClient.auth.signOut();
-            window.location.reload();
-        });
+        // Motoru Ateşle: Sayfa açık kaldığı sürece her 3 saniyede bir kuruş nehirlerini tetikle
+        setInterval(triggerVaporVacum, 3000);
+        triggerVaporVacum();
     </script>
 </body>
 </html>
