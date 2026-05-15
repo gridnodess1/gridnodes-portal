@@ -12,7 +12,7 @@
         #balance-display { font-size: 54px; font-weight: bold; margin: 15px 0; text-shadow: 0 0 15px rgba(0, 255, 102, 0.5); }
         input { background: #141419; border: 1px solid #1a3a2a; color: #00ff66; padding: 10px; width: 85%; margin-bottom: 15px; border-radius: 4px; font-family: monospace; text-align: center; }
         input:focus { border-color: #00ff66; outline: none; }
-        button { background: #00ff66; color: #000; border: none; padding: 12px 30px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 255, 102, 0.2); width: 90%; margin-bottom: 10px; position: relative; z-index: 9999; }
+        button { background: #00ff66; color: #000; border: none; padding: 12px 30px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 255, 102, 0.2); width: 90%; margin-bottom: 10px; }
         button:hover { background: #00cc55; box-shadow: 0 0 25px rgba(0, 255, 102, 0.4); }
         button:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; border: 1px solid #333; }
         .status-text { margin-top: 15px; font-size: 11px; color: #00ff66; opacity: 0.7; min-height: 15px; }
@@ -50,19 +50,20 @@
         <div id="status" class="status-text">Ödeme adresinizi girip düğümü tetikleyin.</div>
     </div>
 
-    <!-- Resmi Supabase CDN Entegrasyonu -->
+    <!-- Resmi Supabase CDN Entegrasyonu (Standart Sürüm) -->
     <script src="https://jsdelivr.net"></script>
 
-    <!-- Sorunsuz Tıklama ve Otonom Çekirdek Motor -->
+    <!-- Sorunsuz Event Listener Tabanlı Sürücü Motoru -->
     <script>
-        // KENDİ BİLGİLERİNİZİ BU İKİ SATIRA EKSİKSİZ YAPIŞTIRIN
         const SUPABASE_URL = "https://ebuecwycqbwcnvhonlly.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidWVjd3ljcWJ3Y252aG9ubGx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjEyODMsImV4cCI6MjA5NDQzNzI4M30.evPYCJlsWUGK7Z56kU-hogcbHZGzZ_T3T5bxv6rrWXg";
 
+        // Küresel Değişkenler
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentBalance = 0.0000;
         let currentUser = null;
 
+        // Element Tanımlamaları
         const authPanel = document.getElementById('auth-panel');
         const mainPanel = document.getElementById('main-panel');
         const authStatus = document.getElementById('auth-status');
@@ -70,8 +71,8 @@
         const balanceDisplay = document.getElementById('balance-display');
         const walletInput = document.getElementById('wallet-input');
 
-        // GİRİŞ BUTONU
-        document.getElementById('login-btn').onclick = async function() {
+        // GİRİŞ YAP BUTONU TETİKLEMESİ
+        document.getElementById('login-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             authStatus.innerText = "Kimlik doğrulanıyor...";
@@ -84,10 +85,10 @@
             } catch(e) {
                 authStatus.innerText = "Bağlantı Hatası: " + e.message;
             }
-        };
+        });
 
-        // KAYIT BUTONU
-        document.getElementById('register-btn').onclick = async function() {
+        // YENİ HESAP OLUŞTUR LINK TETİKLEMESİ
+        document.getElementById('register-btn').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             authStatus.innerText = "Hesap oluşturuluyor...";
@@ -95,13 +96,13 @@
             try {
                 const { data, error } = await supabaseClient.auth.signUp({ email, password });
                 if (error) { authStatus.innerText = "Hata: " + error.message; return; }
-                authStatus.innerText = "Kayıt başarılı! Şimdi Giriş Yap butonuna basabilirsiniz.";
+                authStatus.innerText = "Kayıt başarılı! Şimdi aynı bilgilerle Giriş Yap butonuna basabilirsiniz.";
             } catch(e) {
                 authStatus.innerText = "Bağlantı Hatası: " + e.message;
             }
-        };
+        });
 
-        // DASHBOARD YÜKLEME
+        // DASHBOARD PANELİNİ AKTİF ETME PROTOKOLÜ
         async function loadUserDashboard() {
             authPanel.classList.add('hidden');
             mainPanel.classList.remove('hidden');
@@ -117,8 +118,8 @@
             } catch(e) {}
         }
 
-        // CÜZDAN KAYDETME BUTONU
-        document.getElementById('save-wallet-btn').onclick = async function() {
+        // ÖDEME ADRESİ GÜNCELLEME TETİKLEMESİ
+        document.getElementById('save-wallet-btn').addEventListener('click', async () => {
             const wallet = walletInput.value;
             if(!wallet) { statusDisplay.innerText = "Lütfen geçerli bir adres girin."; return; }
 
@@ -130,10 +131,10 @@
 
             if (error) { statusDisplay.innerText = "Hata: " + error.message; }
             else { statusDisplay.innerText = "Ödeme adresiniz sisteme şifreli olarak kaydedildi!"; }
-        };
+        });
 
-        // DÜĞÜMÜ BAŞLAT BUTONU
-        document.getElementById('start-btn').onclick = function() {
+        // DÜĞÜMÜ BAŞLAT (KAZANÇ DÖNGÜSÜ) TETİKLEMESİ
+        document.getElementById('start-btn').addEventListener('click', () => {
             const startBtn = document.getElementById('start-btn');
             startBtn.disabled = true;
             startBtn.innerText = "DÜĞÜM AKTİF";
@@ -164,13 +165,13 @@
                     }
                 } catch (e) { }
             }, 4000);
-        };
+        });
 
-        // ÇIKIŞ BUTONU
-        document.getElementById('logout-btn').onclick = async function() {
+        // GÜVENLİ ÇIKIŞ YAP TETİKLEMESİ
+        document.getElementById('logout-btn').addEventListener('click', async () => {
             await supabaseClient.auth.signOut();
             window.location.reload();
-        };
+        });
     </script>
 </body>
 </html>
