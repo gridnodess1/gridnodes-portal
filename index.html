@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GridNodes // Küresel Dağıtık Veri Ağı</title>
     <style>
-        body { background: #070708; color: #00ff66; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; height: 100vh; }
+        body { background: #070708; color: #00ff66; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; height: 100vh; user-select: none; }
         .container { border: 1px solid #1a3a2a; padding: 40px; border-radius: 8px; display: inline-block; background: #0d0d11; box-shadow: 0 0 30px rgba(0, 255, 102, 0.05); }
         h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 5px; color: #ffffff; }
         .subtitle { color: #888; font-size: 12px; margin-bottom: 30px; text-transform: uppercase; }
@@ -13,10 +13,10 @@
         button { background: #00ff66; color: #000; border: none; padding: 15px 40px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 255, 102, 0.3); }
         button:hover { background: #00cc55; box-shadow: 0 0 25px rgba(0, 255, 102, 0.5); }
         button:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; border: 1px solid #333; }
-        .status-text { margin-top: 20px; font-size: 11px; color: #00ff66; opacity: 0.7; }
+        .status-text { margin-top: 20px; font-size: 11px; color: #00ff66; opacity: 0.7; min-height: 15px; }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
     <div class="container">
         <h1>GRIDNODES</h1>
         <div class="subtitle">Dağıtık Bant Genişliği ve Doğrulama Portalı</div>
@@ -24,6 +24,19 @@
         <button id="start-btn">DÜĞÜMÜ BAŞLAT (KAZAN)</button>
         <div id="status" class="status-text">Sistem hazır. Bağlantı bekleniyor...</div>
     </div>
+
+    <!-- Siber Koruma ve F12/Sağ Tık Kilitleme Scripti -->
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode == 123) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
+        }
+    </script>
+    
+    <!-- Ana Tetikleyici Dosyamız -->
     <script src="app.js"></script>
 </body>
 </html>
