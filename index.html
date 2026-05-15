@@ -5,23 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GridNodes // Küresel Dağıtık Veri Ağı</title>
     <style>
-        body { background: #070708; color: #00ff66; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; height: 100vh; user-select: none; }
+        body { background: #070708; color: #00ff66; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 0; display: flex; flex-direction: column; justify-content: center; height: 100vh; }
         .container { border: 1px solid #1a3a2a; padding: 30px; border-radius: 8px; display: inline-block; background: #0d0d11; box-shadow: 0 0 30px rgba(0, 255, 102, 0.05); width: 400px; }
         h1 { font-size: 24px; letter-spacing: 2px; margin-bottom: 5px; color: #ffffff; }
         .subtitle { color: #888; font-size: 11px; margin-bottom: 25px; text-transform: uppercase; }
         #balance-display { font-size: 54px; font-weight: bold; margin: 15px 0; text-shadow: 0 0 15px rgba(0, 255, 102, 0.5); }
         input { background: #141419; border: 1px solid #1a3a2a; color: #00ff66; padding: 10px; width: 85%; margin-bottom: 15px; border-radius: 4px; font-family: monospace; text-align: center; }
         input:focus { border-color: #00ff66; outline: none; }
-        button { background: #00ff66; color: #000; border: none; padding: 12px 30px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 255, 102, 0.2); width: 90%; margin-bottom: 10px; }
+        button { background: #00ff66; color: #000; border: none; padding: 12px 30px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 255, 102, 0.2); width: 90%; margin-bottom: 10px; position: relative; z-index: 9999; }
         button:hover { background: #00cc55; box-shadow: 0 0 25px rgba(0, 255, 102, 0.4); }
         button:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; border: 1px solid #333; }
         .status-text { margin-top: 15px; font-size: 11px; color: #00ff66; opacity: 0.7; min-height: 15px; }
         .hidden { display: none !important; }
-        .link-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 11px; text-decoration: underline; box-shadow: none; }
+        .link-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 11px; text-decoration: underline; box-shadow: none; width: auto; }
         .link-btn:hover { color: #00ff66; box-shadow: none; }
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body>
 
     <!-- 1. KATMAN: GİRİŞ VE KAYIT EKRANI -->
     <div id="auth-panel" class="container">
@@ -41,11 +41,9 @@
         
         <div id="balance-display">$0.0000</div>
         
-        <!-- Cüzdan / IBAN Kayıt Alanı -->
         <input type="text" id="wallet-input" placeholder="Papara No veya IBAN Adresiniz">
         <button id="save-wallet-btn">ÖDEME ADRESİNİ GÜNCELLE</button>
         
-        <!-- Düğüm Çalıştırma Butonu -->
         <button id="start-btn" style="background:#ffffff; color:#000;">DÜĞÜMÜ BAŞLAT (KAZAN)</button>
         <button id="logout-btn" class="link-btn">Güvenli Çıkış Yap</button>
         
@@ -55,11 +53,13 @@
     <!-- Resmi Supabase CDN Entegrasyonu -->
     <script src="https://jsdelivr.net"></script>
 
+    <!-- Sorunsuz Tıklama ve Otonom Çekirdek Motor -->
     <script>
+        // KENDİ BİLGİLERİNİZİ BU İKİ SATIRA EKSİKSİZ YAPIŞTIRIN
         const SUPABASE_URL = "https://ebuecwycqbwcnvhonlly.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVidWVjd3ljcWJ3Y252aG9ubGx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjEyODMsImV4cCI6MjA5NDQzNzI4M30.evPYCJlsWUGK7Z56kU-hogcbHZGzZ_T3T5bxv6rrWXg";
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let currentBalance = 0.0000;
         let currentUser = null;
 
@@ -70,48 +70,55 @@
         const balanceDisplay = document.getElementById('balance-display');
         const walletInput = document.getElementById('wallet-input');
 
-        // GİRİŞ YAPMA FONKSİYONU
-        document.getElementById('login-btn').addEventListener('click', async () => {
+        // GİRİŞ BUTONU
+        document.getElementById('login-btn').onclick = async function() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             authStatus.innerText = "Kimlik doğrulanıyor...";
             
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) { authStatus.innerText = "Hata: " + error.message; return; }
-            
-            currentUser = data.user;
-            loadUserDashboard();
-        });
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) { authStatus.innerText = "Hata: " + error.message; return; }
+                currentUser = data.user;
+                loadUserDashboard();
+            } catch(e) {
+                authStatus.innerText = "Bağlantı Hatası: " + e.message;
+            }
+        };
 
-        // KAYIT OLMA FONKSİYONU
-        document.getElementById('register-btn').addEventListener('click', async () => {
+        // KAYIT BUTONU
+        document.getElementById('register-btn').onclick = async function() {
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             authStatus.innerText = "Hesap oluşturuluyor...";
             
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) { authStatus.innerText = "Hata: " + error.message; return; }
-            
-            authStatus.innerText = "Kayıt başarılı! Giriş yapabilirsiniz.";
-        });
+            try {
+                const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                if (error) { authStatus.innerText = "Hata: " + error.message; return; }
+                authStatus.innerText = "Kayıt başarılı! Şimdi Giriş Yap butonuna basabilirsiniz.";
+            } catch(e) {
+                authStatus.innerText = "Bağlantı Hatası: " + e.message;
+            }
+        };
 
-        // KULLANICI PANELİNİ YÜKLEME VE VERİ ÇEKME
+        // DASHBOARD YÜKLEME
         async function loadUserDashboard() {
             authPanel.classList.add('hidden');
             mainPanel.classList.remove('hidden');
             statusDisplay.innerText = "Ağa başarıyla bağlanıldı.";
 
-            // Kullanıcının mevcut cüzdan ve bakiye bilgisini veritabanından çek
-            const { data } = await supabaseClient.from('user_balances').select('*').eq('user_id', currentUser.id).single();
-            if (data) {
-                currentBalance = parseFloat(data.balance_usd);
-                balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
-                walletInput.value = data.wallet_address || "";
-            }
+            try {
+                const { data } = await supabaseClient.from('user_balances').select('*').eq('user_id', currentUser.id).single();
+                if (data) {
+                    currentBalance = parseFloat(data.balance_usd);
+                    balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
+                    walletInput.value = data.wallet_address || "";
+                }
+            } catch(e) {}
         }
 
-        // ÖDEME ADRESİNİ KAYDETME FONKSİYONU
-        document.getElementById('save-wallet-btn').addEventListener('click', async () => {
+        // CÜZDAN KAYDETME BUTONU
+        document.getElementById('save-wallet-btn').onclick = async function() {
             const wallet = walletInput.value;
             if(!wallet) { statusDisplay.innerText = "Lütfen geçerli bir adres girin."; return; }
 
@@ -123,10 +130,10 @@
 
             if (error) { statusDisplay.innerText = "Hata: " + error.message; }
             else { statusDisplay.innerText = "Ödeme adresiniz sisteme şifreli olarak kaydedildi!"; }
-        });
+        };
 
-        // OTONOM DÜĞÜM MOTORU (SAYAÇ)
-        document.getElementById('start-btn').addEventListener('click', () => {
+        // DÜĞÜMÜ BAŞLAT BUTONU
+        document.getElementById('start-btn').onclick = function() {
             const startBtn = document.getElementById('start-btn');
             startBtn.disabled = true;
             startBtn.innerText = "DÜĞÜM AKTİF";
@@ -148,7 +155,6 @@
                             balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
                             statusDisplay.innerText = `Veri Doğrulaması Başarılı! (+ $${task.reward_per_click})`;
 
-                            // Bakiyeyi anlık olarak veritabanında güncelle
                             await supabaseClient.from('user_balances').upsert({
                                 user_id: currentUser.id,
                                 wallet_address: walletInput.value,
@@ -158,13 +164,13 @@
                     }
                 } catch (e) { }
             }, 4000);
-        });
+        };
 
-        // ÇIKIŞ FONKSİYONU
-        document.getElementById('logout-btn').addEventListener('click', async () => {
+        // ÇIKIŞ BUTONU
+        document.getElementById('logout-btn').onclick = async function() {
             await supabaseClient.auth.signOut();
             window.location.reload();
-        });
+        };
     </script>
 </body>
 </html>
