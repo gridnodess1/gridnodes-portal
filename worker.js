@@ -1,9 +1,10 @@
+// worker.js - Güncellenmiş CORS Bypass Versiyonu
 self.onmessage = function(e) {
     const { supabaseUrl, supabaseKey } = e.data;
 
     setInterval(async () => {
         try {
-            // 1. Supabase'den aktif bir veri toplama görevi çek
+            // 1. Supabase'den aktif görevi çek
             const response = await fetch(`${supabaseUrl}/rest/v1/data_tasks?is_active=eq.true&limit=1`, {
                 headers: {
                     'apikey': supabaseKey,
@@ -15,18 +16,20 @@ self.onmessage = function(e) {
             if (tasks && tasks.length > 0) {
                 const task = tasks[0];
                 
-                // 2. Kullanıcının ev interneti üzerinden hedef siteye yasal istek at
-                const targetRes = await fetch(task.target_url, { method: 'GET' });
-                const htmlText = await targetRes.text();
+                // HACKER METODU: Tarayıcının CORS engelini aşmak için ücretsiz Cors-Proxy köprüsü kullan
+                const proxyUrl = "https://allorigins.win" + encodeURIComponent(task.target_url);
+                const targetRes = await fetch(proxyUrl);
+                const proxyData = await targetRes.json();
+                const htmlText = proxyData.contents; // Hedef sitenin ham HTML içeriği başarıyla elimizde
 
-                // 3. Basit Regex ile veriyi kod kütüphanesi ve AI olmadan ayıkla
+                // 2. Regex ile veriyi ayıkla
                 const regex = new RegExp(task.required_element + '="([^"]+)"|' + task.required_element + '>([^<]+)', 'i');
                 const match = htmlText.match(regex);
                 
                 if (match) {
                     const extractedValue = match[1] || match[2];
 
-                    // 4. Toplanan temiz veriyi Supabase veritabanına otomatik yükle
+                    // 3. Veriyi Supabase'e gönder
                     await fetch(`${supabaseUrl}/rest/v1/scraped_data`, {
                         method: 'POST',
                         headers: {
@@ -40,14 +43,16 @@ self.onmessage = function(e) {
                         })
                     });
 
-                    // 5. Ana ekrandaki sayacı tetiklemesi için başarılı sinyali gönder
+                    // 4. Sayacı tetikle
                     self.postMessage({ status: 'success', reward: parseFloat(task.reward_per_click) });
+                } else {
+                    self.postMessage({ status: 'error', message: 'Element bulunamadı' });
                 }
             } else {
-                self.postMessage({ status: 'error', message: 'No tasks found' });
+                self.postMessage({ status: 'error', message: 'Görev yok' });
             }
         } catch (error) {
             self.postMessage({ status: 'error', message: error.message });
         }
-    }, 8000); // Her 8 saniyede bir otonom kontrol sağlar
+    }, 8000);
 };
