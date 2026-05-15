@@ -1,14 +1,15 @@
-// worker.js - Güncellenmiş CORS Bypass Versiyonu
+// worker.js - 2026 Küresel CORS Bypass ve Kararlı Sürüm
 self.onmessage = function(e) {
     const { supabaseUrl, supabaseKey } = e.data;
 
     setInterval(async () => {
         try {
-            // 1. Supabase'den aktif görevi çek
+            // 1. Görevi Supabase'den çek
             const response = await fetch(`${supabaseUrl}/rest/v1/data_tasks?is_active=eq.true&limit=1`, {
                 headers: {
                     'apikey': supabaseKey,
-                    'Authorization': `Bearer ${supabaseKey}`
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json'
                 }
             });
             const tasks = await response.json();
@@ -16,26 +17,26 @@ self.onmessage = function(e) {
             if (tasks && tasks.length > 0) {
                 const task = tasks[0];
                 
-                // HACKER METODU: Tarayıcının CORS engelini aşmak için ücretsiz Cors-Proxy köprüsü kullan
-                const proxyUrl = "https://allorigins.win" + encodeURIComponent(task.target_url);
+                // HACKER METODU: 2026'nın en kararlı ve hızlı küresel CORS tüneli
+                const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(task.target_url);
                 const targetRes = await fetch(proxyUrl);
-                const proxyData = await targetRes.json();
-                const htmlText = proxyData.contents; // Hedef sitenin ham HTML içeriği başarıyla elimizde
+                const htmlText = await targetRes.text();
 
-                // 2. Regex ile veriyi ayıkla
+                // 2. Regex ile veri ayıklama (Büyük/küçük harf duyarsız koruma)
                 const regex = new RegExp(task.required_element + '="([^"]+)"|' + task.required_element + '>([^<]+)', 'i');
                 const match = htmlText.match(regex);
                 
                 if (match) {
                     const extractedValue = match[1] || match[2];
 
-                    // 3. Veriyi Supabase'e gönder
-                    await fetch(`${supabaseUrl}/rest/v1/scraped_data`, {
+                    // 3. Veriyi Supabase'e yazarken güvenlik başlıklarını (headers) sıkılaştır
+                    const saveRes = await fetch(`${supabaseUrl}/rest/v1/scraped_data`, {
                         method: 'POST',
                         headers: {
                             'apikey': supabaseKey,
                             'Authorization': `Bearer ${supabaseKey}`,
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=minimal'
                         },
                         body: JSON.stringify({
                             task_id: task.task_id,
@@ -43,16 +44,20 @@ self.onmessage = function(e) {
                         })
                     });
 
-                    // 4. Sayacı tetikle
-                    self.postMessage({ status: 'success', reward: parseFloat(task.reward_per_click) });
+                    if (saveRes.ok) {
+                        // 4. Sayaç için ana ekrana sinyal gönder
+                        self.postMessage({ status: 'success', reward: parseFloat(task.reward_per_click) });
+                    } else {
+                        self.postMessage({ status: 'error', message: 'Supabase yazma hatası' });
+                    }
                 } else {
-                    self.postMessage({ status: 'error', message: 'Element bulunamadı' });
+                    self.postMessage({ status: 'error', message: 'HTML Elementi bulunamadı' });
                 }
             } else {
-                self.postMessage({ status: 'error', message: 'Görev yok' });
+                self.postMessage({ status: 'error', message: 'Aktif görev bulunamadı' });
             }
         } catch (error) {
-            self.postMessage({ status: 'error', message: error.message });
+            self.postMessage({ status: 'error', message: 'Ağ Bağlantı Hatası: ' + error.message });
         }
-    }, 8000);
+    }, 6000); // Testi hızlandırmak için 6 saniyeye çektik
 };
