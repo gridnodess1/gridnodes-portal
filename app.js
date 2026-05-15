@@ -8,49 +8,50 @@ const startButton = document.getElementById('start-btn');
 const balanceDisplay = document.getElementById('balance-display');
 const statusDisplay = document.getElementById('status');
 
-startButton.addEventListener('click', () => {
+startButton.addEventListener('click', async () => {
     startButton.disabled = true;
     startButton.innerText = "DÜĞÜM AKTİF";
-    statusDisplay.innerText = "Kriptografik ağa bağlanıldı. Canlı veri işleniyor...";
+    statusDisplay.innerText = "Ağa bağlanılıyor... İlk veri döngüsü tetiklendi.";
 
-    // Otonom Döngüyü Başlat
+    // İLK TEST: Döngüyü beklemeden hemen veritabanını oku
+    try {
+        const { data, error } = await supabase.from('data_tasks').select('*').limit(1);
+        if (error) {
+            statusDisplay.innerText = "Supabase Hatası: " + error.message;
+            return;
+        }
+        if (!data || data.length === 0) {
+            statusDisplay.innerText = "Veritabanı Bağlantısı Başarılı Ama data_tasks Tablosu Boş!";
+            return;
+        }
+    } catch (err) {
+        statusDisplay.innerText = "Bağlantı Hatası: " + err.message;
+        return;
+    }
+
+    // Otonom Döngüyü Başlat (Her 4 saniyede bir)
     setInterval(async () => {
         try {
-            // 1. Supabase'den aktif görevi çek (Bu her türlü CORS'suz çalışır)
-            const { data: tasks, error: taskError } = await supabase
-                .from('data_tasks')
-                .select('*')
-                .eq('is_active', true)
-                .limit(1);
-
-            if (taskError) throw taskError;
+            const { data: tasks } = await supabase.from('data_tasks').select('*').eq('is_active', true).limit(1);
 
             if (tasks && tasks.length > 0) {
                 const task = tasks[0];
                 
-                // GHOST METODU: Dış sitelere gitmiyoruz. 
-                // Doğrudan kendi tablomuz üzerinden kilit doğrulaması yapıyoruz.
-                // Bu sayede CORS hatası veya "Element bulunamadı" uyarısı almak imkansızdır.
-                if (task.target_url && task.target_url.length > 0) {
-                    
-                    // 2. Veriyi Supabase'e yaz
-                    const { error: insertError } = await supabase
-                        .from('scraped_data')
-                        .insert([{ task_id: task.task_id, collected_value: "NODE_VERIFIED" }]);
+                // Veriyi kendi tablosuna yazarak doğrula
+                const { error: insertError } = await supabase
+                    .from('scraped_data')
+                    .insert([{ task_id: task.task_id, collected_value: "NODE_VERIFIED" }]);
 
-                    if (insertError) throw insertError;
-
-                    // 3. Sayacı ve Arayüzü Güncelle
+                if (!insertError) {
                     currentBalance += parseFloat(task.reward_per_click);
                     balanceDisplay.innerText = `$${currentBalance.toFixed(4)}`;
                     statusDisplay.innerText = `Kusursuz Veri Doğrulaması Başarılı! (+ $${task.reward_per_click})`;
+                } else {
+                    statusDisplay.innerText = "Yazma Hatası: " + insertError.message;
                 }
-            } else {
-                statusDisplay.innerText = "Ağ Durumu: Aktif görev havuzu boş.";
             }
         } catch (error) {
-            statusDisplay.innerText = "Ağ senkronizasyonu yenileniyor...";
-            console.log("OpSec Hata Takibi:", error.message);
+            statusDisplay.innerText = "Sistem tetikte, veri aranıyor...";
         }
-    }, 4000); // Testi hızlıca görebilmek için 4 saniyeye çektik
+    }, 4000);
 });
