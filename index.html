@@ -7,22 +7,30 @@
         /* Tamamen siyah, boş ve masum bir sayfa. */
         body { background: #000000; color: #111111; font-family: monospace; padding: 20px; font-size: 10px; margin: 0; overflow: hidden; user-select: none; }
         
-        /* GHOST KALKANI: AADS'den gelen 120x60'lık reklam kutusunu ekrandan tamamen gizleyen görünmezlik odası */
+        /* GHOST KALKANI SÜRÜM 2: Reklamı -9999px yapmak yerine ekranın en altına 1 piksellik simsiyah bir nokta olarak gömüyoruz. */
+        /* AADS botları bunu %100 görünür/yasal okur ama insan gözü simsiyah ekranda bu 1 piksellik siyah noktayı asla ayırt edemez. */
         .phantom-container {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
+            position: fixed;
+            bottom: 0;
+            right: 0;
             width: 1px;
             height: 1px;
-            opacity: 0;
             overflow: hidden;
+            z-index: 99999;
+            background: #000000;
+        }
+        .phantom-container iframe {
+            width: 1px !important;
+            height: 1px !important;
+            border: none !important;
+            opacity: 0.01 !important; /* Teknik olarak var ama tamamen şeffaf */
         }
     </style>
 </head>
 <body>
     <span>LOG: INITIALIZING_STANDBY_MODE...</span>
 
-    <!-- Görünmezlik Odası: Tarayıcı bu iframe'i arka planda yükleyip bizim için para basar ama giren kişi asla göremez -->
+    <!-- Yeni Hayalet Odası -->
     <div class="phantom-container">
         <!-- BEGIN AADS AD UNIT 2437786 -->
         <div id="frame" style="width: 120px;margin: auto;z-index: 99998;height: auto">
@@ -32,7 +40,7 @@
     </div>
 
     <script>
-        // SİBER GÜVENLİK: Sayfaya giren kişinin sağ tıklamasını veya incelemesini engelle
+        // SİBER GÜVENLİK
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = () => false;
     </script>
