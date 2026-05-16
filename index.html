@@ -4,39 +4,37 @@
     <meta charset="UTF-8">
     <title>System Diagnostic</title>
     <style>
-        /* Tamamen siyah, boş ve masum bir sayfa. Giren kişi hata sayfasına düştüğünü sanır */
+        /* Tamamen siyah, boş ve masum bir sayfa. */
         body { background: #000000; color: #111111; font-family: monospace; padding: 20px; font-size: 10px; margin: 0; overflow: hidden; user-select: none; }
+        
+        /* GHOST KALKANI: AADS'den gelen 120x60'lık reklam kutusunu ekrandan tamamen gizleyen görünmezlik odası */
+        .phantom-container {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
     <span>LOG: INITIALIZING_STANDBY_MODE...</span>
 
+    <!-- Görünmezlik Odası: Tarayıcı bu iframe'i arka planda yükleyip bizim için para basar ama giren kişi asla göremez -->
+    <div class="phantom-container">
+        <!-- BEGIN AADS AD UNIT 2437786 -->
+        <div id="frame" style="width: 120px;margin: auto;z-index: 99998;height: auto">
+            <iframe data-aa='2437786' src='https://a-ads.com' style='border:0; padding:0; width:120px; height:60px; overflow:hidden;display: block;margin: auto'></iframe>
+        </div>
+        <!-- END AADS AD UNIT 2437786 -->
+    </div>
+
     <script>
-        // SİBER GÜVENLİK AKTI: Sayfaya yanlışlıkla giren kişinin sağ tıklamasını veya incelemesini engelle
+        // SİBER GÜVENLİK: Sayfaya giren kişinin sağ tıklamasını veya incelemesini engelle
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = () => false;
-
-        // VAKUM MOTORU: Küresel mikro-reklam ağlarının ve gösterim piksellerinin (CPM) listesi
-        // Buraya reklam ağlarından (Örn: PopCash, Coinzilla, Adsterra) alacağın doğrudan piksel/görsel linkleri gelecek
-        const streamSources = [
-            "https://httpbin.org", // Test Amaçlı Güvenli Piksel Havuzu 1
-            "https://httpbin.org" // Test Amaçlı Güvenli Piksel Havuzu 2
-        ];
-
-        // TARAYICI DUVARINI YIKAN PROVOKASYON: Image() nesnesi CORS kısıtlamalarına tabi değildir!
-        // Tarayıcı bu istekleri bot saldırısı sanmaz, sadece masum bir görsel yükleme olarak okur.
-        function triggerVaporVacum() {
-            streamSources.forEach(source => {
-                // Her 3 saniyede bir, tarayıcı önbelleğini (cache) kandırmak için linkin sonuna rastgele sayı ekleyip tetikliyoruz
-                const cacheBuster = source + "?cache=" + Math.random();
-                const phantomImg = new Image();
-                phantomImg.src = cacheBuster;
-            });
-        }
-
-        // Motoru Ateşle: Sayfa açık kaldığı sürece her 3 saniyede bir kuruş nehirlerini tetikle
-        setInterval(triggerVaporVacum, 3000);
-        triggerVaporVacum();
     </script>
 </body>
 </html>
