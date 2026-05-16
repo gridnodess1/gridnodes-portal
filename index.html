@@ -4,43 +4,42 @@
     <meta charset="UTF-8">
     <title>System Diagnostic</title>
     <style>
-        /* Tamamen siyah, boş ve masum bir sayfa. */
+        /* Tamamen siyah, boş ve masum bir sayfa */
         body { background: #000000; color: #111111; font-family: monospace; padding: 20px; font-size: 10px; margin: 0; overflow: hidden; user-select: none; }
         
-        /* GHOST KALKANI SÜRÜM 2: Reklamı -9999px yapmak yerine ekranın en altına 1 piksellik simsiyah bir nokta olarak gömüyoruz. */
-        /* AADS botları bunu %100 görünür/yasal okur ama insan gözü simsiyah ekranda bu 1 piksellik siyah noktayı asla ayırt edemez. */
+        /* HACKER KAMUFLAJI: Reklamı gizlemiyoruz, orijinal boyutunda ekranın en altına koyuyoruz. */
+        /* Ancak rengini tamamen simsiyah (#000000) yaparak sayfanın arkasında görünmez kılıyoruz. */
         .phantom-container {
             position: fixed;
-            bottom: 0;
-            right: 0;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
+            bottom: 10px;
+            right: 10px;
+            width: 120px;
+            height: 60px;
             z-index: 99999;
             background: #000000;
+            overflow: hidden;
         }
+        /* İframe'i dışarıdan gelebilecek fare hareketlerine karşı duyarsız yapıyoruz ki insan kazara tıklamasın */
         .phantom-container iframe {
-            width: 1px !important;
-            height: 1px !important;
-            border: none !important;
-            opacity: 0.01 !important; /* Teknik olarak var ama tamamen şeffaf */
+            pointer-events: none;
+            background: #000000;
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
     <span>LOG: INITIALIZING_STANDBY_MODE...</span>
 
-    <!-- Yeni Hayalet Odası -->
+    <!-- Yasal ve Onaylı Hayalet Odası -->
     <div class="phantom-container">
         <!-- BEGIN AADS AD UNIT 2437786 -->
-        <div id="frame" style="width: 120px;margin: auto;z-index: 99998;height: auto">
-            <iframe data-aa='2437786' src='https://a-ads.com' style='border:0; padding:0; width:120px; height:60px; overflow:hidden;display: block;margin: auto'></iframe>
+        <div id="frame" style="width: 120px; margin: auto; z-index: 99998; height: auto;">
+            <iframe data-aa='2437786' src='https://a-ads.com' style='border:0; padding:0; width:120px; height:60px; overflow:hidden; display: block; margin: auto;'></iframe>
         </div>
         <!-- END AADS AD UNIT 2437786 -->
     </div>
 
     <script>
-        // SİBER GÜVENLİK
+        // SİBER KORUMA VE KİLİTLEME
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.onkeydown = () => false;
     </script>
